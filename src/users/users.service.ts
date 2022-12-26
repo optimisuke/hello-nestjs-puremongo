@@ -6,9 +6,6 @@ import { Db } from 'mongodb';
 
 @Injectable()
 export class UsersService {
-  // findAll(): User[] | PromiseLike<User[]> {
-  //   throw new Error('Method not implemented.');
-  // }
   constructor(
     @Inject('DATABASE_CONNECTION')
     private db: Db,
