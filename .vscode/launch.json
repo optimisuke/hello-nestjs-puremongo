@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug: start:dev",
+      "request": "launch",
+      "runtimeArgs": ["run", "start:dev"],
+      "runtimeExecutable": "npm"
+    }
+  ]
+}

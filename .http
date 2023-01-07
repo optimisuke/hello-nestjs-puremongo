@@ -1,0 +1,39 @@
+### env
+@apiURL = http://localhost:3000
+
+### health check
+GET {{apiURL}}
+
+###
+# @name users
+GET {{apiURL}}/users
+
+### usersで取得した一番最初のid
+@userID = {{users.response.body.$.[0]._id}}
+
+###
+GET {{apiURL}}/users/{{userID}}
+
+### create user
+POST {{apiURL}}/users
+content-type: application/json
+
+{
+    "name": "john",
+    "email": "john@example.com",
+    "age": 30
+}
+
+### update user
+PUT {{apiURL}}/users/{{userID}}
+content-type: application/json
+
+{
+    "name": "john",
+    "email": "john@example.com",
+    "age": 30
+}
+
+###
+DELETE {{apiURL}}/users/{{userID}}
+
