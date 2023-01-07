@@ -2,23 +2,27 @@ import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { Db, ObjectId } from 'mongodb';
+import { Collection, Db, ObjectId } from 'mongodb';
 
 @Injectable()
 export class UsersService {
+  collectionUser: Collection<User>;
+
   constructor(
     @Inject('DATABASE_CONNECTION')
     private db: Db,
-  ) {}
+  ) {
+    this.collectionUser = db.collection<User>('users');
+  }
 
   async find(): Promise<User[]> {
-    return await this.db.collection<User>('users').find().toArray();
+    return await this.collectionUser.find().toArray();
   }
 
   async findOne(id: string): Promise<User> {
-    const response = await this.db
-      .collection<User>('users')
-      .findOne({ _id: new ObjectId(id) });
+    const response = await this.collectionUser.findOne({
+      _id: new ObjectId(id),
+    });
 
     if (!response) {
       throw new NotFoundException();
@@ -28,11 +32,11 @@ export class UsersService {
   }
 
   async create(body: CreateUserDto): Promise<void> {
-    await this.db.collection<User>('users').insertOne(body);
+    await this.collectionUser.insertOne(body);
   }
 
   async update(id: string, body: UpdateUserDto): Promise<User> {
-    const response = await this.db.collection<User>('users').findOneAndUpdate(
+    const response = await this.collectionUser.findOneAndUpdate(
       {
         _id: new ObjectId(id),
       },
@@ -53,9 +57,9 @@ export class UsersService {
   }
 
   async delete(id: string): Promise<void> {
-    const response = await this.db
-      .collection<User>('users')
-      .deleteOne({ _id: new ObjectId(id) });
+    const response = await this.collectionUser.deleteOne({
+      _id: new ObjectId(id),
+    });
 
     if (response.deletedCount === 0) {
       throw new NotFoundException();
