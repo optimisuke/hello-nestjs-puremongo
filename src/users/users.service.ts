@@ -32,8 +32,6 @@ export class UsersService {
   }
 
   async update(id: string, body: UpdateUserDto): Promise<User> {
-    console.log(id);
-
     const response = await this.db.collection<User>('users').findOneAndUpdate(
       {
         _id: new ObjectId(id),
