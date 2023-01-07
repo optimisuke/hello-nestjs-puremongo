@@ -2,7 +2,7 @@ import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { Db } from 'mongodb';
+import { Db, ObjectId } from 'mongodb';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +18,7 @@ export class UsersService {
   async findOne(id: string): Promise<User> {
     const response = await this.db
       .collection<User>('users')
-      .findOne({ _id: id });
+      .findOne({ _id: new ObjectId(id) });
 
     if (!response) {
       throw new NotFoundException();
@@ -28,26 +28,36 @@ export class UsersService {
   }
 
   async create(body: CreateUserDto): Promise<void> {
-    await this.db.collection('users').insertOne(body);
+    await this.db.collection<User>('users').insertOne(body);
   }
 
-  async update(id: string, body: UpdateUserDto): Promise<void> {
-    await this.db.collection('users').updateOne(
+  async update(id: string, body: UpdateUserDto): Promise<User> {
+    console.log(id);
+
+    const response = await this.db.collection<User>('users').findOneAndUpdate(
       {
-        _id: id,
+        _id: new ObjectId(id),
       },
       {
         $set: {
           ...body,
         },
       },
+      {
+        returnDocument: 'after',
+      },
     );
+    if (!response.ok) {
+      throw new NotFoundException();
+    }
+
+    return response.value;
   }
 
   async delete(id: string): Promise<void> {
-    const response = await this.db.collection('users').deleteOne({
-      _id: id,
-    });
+    const response = await this.db
+      .collection<User>('users')
+      .deleteOne({ _id: new ObjectId(id) });
 
     if (response.deletedCount === 0) {
       throw new NotFoundException();
